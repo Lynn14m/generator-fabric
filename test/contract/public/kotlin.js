@@ -22,6 +22,7 @@ describe('Contract (Kotlin)', () => {
             .inTmpDir(() => {
             }).withPrompts({
                 subgenerator: 'contract',
+                contractType: 'public',
                 language: 'rockstar',
                 name: 'JamesKotlinContract',
                 version: '0.0.1',
@@ -40,6 +41,7 @@ describe('Contract (Kotlin)', () => {
             })
             .withPrompts({
                 subgenerator: 'contract',
+                contractType: 'public',
                 language: 'kotlin',
                 name: 'JamesKotlinContract',
                 version: '0.0.1',
@@ -86,6 +88,7 @@ describe('Contract (Kotlin)', () => {
             })
             .withPrompts({
                 subgenerator: 'contract',
+                contractType: 'public',
                 language: 'kotlin',
                 name: 'JamesKotlinContract',
                 version: '0.0.1',

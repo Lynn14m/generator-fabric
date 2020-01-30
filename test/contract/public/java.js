@@ -22,6 +22,7 @@ describe('Contract (Java)', () => {
             .inTmpDir(() => {
             }).withPrompts({
                 subgenerator: 'contract',
+                contractType: 'public',
                 language: 'rockstar',
                 name: 'JamesJavaContract',
                 version: '0.0.1',
@@ -40,6 +41,7 @@ describe('Contract (Java)', () => {
             })
             .withPrompts({
                 subgenerator: 'contract',
+                contractType: 'public',
                 language: 'java',
                 name: 'JamesJavaContract',
                 version: '0.0.1',
@@ -88,6 +90,7 @@ describe('Contract (Java)', () => {
             })
             .withPrompts({
                 subgenerator: 'contract',
+                contractType: 'public',
                 language: 'java',
                 name: 'JamesJavaContract',
                 version: '0.0.1',
