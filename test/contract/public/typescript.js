@@ -20,7 +20,6 @@ describe('Contract (TypeScript)', () => {
             })
             .withPrompts({
                 subgenerator: 'contract',
-                contractType: 'default',
                 language: 'typescript',
                 name: 'my-typescript-contract',
                 version: '0.0.1',
@@ -147,7 +146,6 @@ describe('Contract (TypeScript)', () => {
             })
             .withPrompts({
                 subgenerator: 'contract',
-                contractType: 'default',
                 language: 'typescript',
                 name: 'my-typescript-contract',
                 version: '0.0.1',
