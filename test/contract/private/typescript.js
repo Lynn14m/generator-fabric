@@ -7,57 +7,73 @@
 const assert = require('yeoman-assert');
 const helpers = require('yeoman-test');
 const path = require('path');
+const sinonChai = require('sinon-chai');
 const Mocha = require('mocha');
 const sinon = require('sinon');
-const sinonChai = require('sinon-chai');
 const chai = require('chai');
 chai.should();
 chai.use(sinonChai);
 
-describe('Contract (JavaScript)', () => {
+describe('Contract (TypeScript)', () => {
     let dir;
+
     const sandbox = sinon.createSandbox();
     afterEach(() => {
         sandbox.restore();
     });
 
     let genericPackage = {
-        name: 'my-javascript-contract',
+        name: 'my-typescript-contract',
         version: '0.0.1',
-        description: 'My JavaScript Contract',
-        main: 'index.js',
+        description: 'My TypeScript Contract',
+        main: 'dist/index.js',
+        typings: 'dist/index.d.ts',
         engines: {
             node: '>=8',
             npm: '>=5'
         },
         scripts: {
-            lint: 'eslint .',
+            lint: 'tslint -c tslint.json \'src/**/*.ts\'',
             pretest: 'npm run lint',
-            test: 'nyc mocha --recursive',
-            start: 'fabric-chaincode-node start'
+            test: 'nyc mocha -r ts-node/register src/**/*.spec.ts',
+            start: 'fabric-chaincode-node start',
+            build: 'tsc',
+            'build:watch': 'tsc -w',
+            prepublishOnly: 'npm run build'
         },
         engineStrict: true,
         author: 'James Conga',
         license: 'WTFPL',
         dependencies: {
-            'fabric-contract-api': '^1.4.4',
-            'fabric-shim': '^1.4.4'
+            'fabric-shim': '^1.4.4',
+            'fabric-contract-api': '^1.4.4'
         },
         devDependencies: {
+            '@types/chai': '^4.2.0',
+            '@types/chai-as-promised': '^7.1.2',
+            '@types/mocha': '^5.2.7',
+            '@types/node': '^12.7.3',
+            '@types/sinon': '^7.0.13',
+            '@types/sinon-chai': '^3.2.3',
             chai: '^4.2.0',
             'chai-as-promised': '^7.1.1',
-            eslint: '^6.3.0',
             mocha: '^6.2.0',
             nyc: '^14.1.1',
             sinon: '^7.4.1',
             'sinon-chai': '^3.3.0',
+            'ts-node': '^8.3.0',
+            tslint: '^5.19.0',
+            typescript: '^3.6.2',
             winston: '^3.2.1'
         },
         nyc: {
+            extension: [
+                '.ts',
+                '.tsx'
+            ],
             exclude: [
-                '.eslintrc.js',
                 'coverage/**',
-                'test/**'
+                'dist/**'
             ],
             reporter: [
                 'text-summary',
@@ -74,32 +90,32 @@ describe('Contract (JavaScript)', () => {
 
     let genericPDC = [
         {
-            "name": "CollectionOne",
-            "policy": {
-                "identities": [
+            name: 'CollectionOne',
+            policy: {
+                identities: [
                     {
-                        "role": {
-                            "name": "member",
-                            "mspId": "Org1MSP"
+                        role: {
+                            name: 'member',
+                            mspId: 'Org1MSP'
                         }
                     }
                 ],
-                "policy": {
-                    "1-of": [
+                policy: {
+                    '1-of': [
                         {
-                            "signed-by": 0
+                            'signed-by': 0
                         }
                     ]
                 }
             },
-            "requiredPeerCount": 1,
-            "maxPeerCount": 1,
-            "blockToLive": 0,
-            "memberOnlyRead": true
+            requiredPeerCount: 1,
+            maxPeerCount: 1,
+            blockToLive: 0,
+            memberOnlyRead: true
         }
     ];
 
-    it('should generate a JavaScript project using prompts', async () => {
+    it('should generate a TypeScript project using prompts', async () => {
         await helpers.run(path.join(__dirname, '../../../generators/app'))
             .inTmpDir((dir_) => {
                 dir = dir_;
@@ -107,10 +123,10 @@ describe('Contract (JavaScript)', () => {
             .withPrompts({
                 subgenerator: 'contract',
                 contractType: 'private',
-                language: 'javascript',
-                name: 'my-javascript-contract',
+                language: 'typescript',
+                name: 'my-typescript-contract',
                 version: '0.0.1',
-                description: 'My JavaScript Contract',
+                description: 'My Typescript Contract',
                 author: 'James Conga',
                 license: 'WTFPL',
                 asset: 'myPrivateConga',
@@ -119,44 +135,48 @@ describe('Contract (JavaScript)', () => {
         assert.file([
             '.vscode/extensions.json',
             '.vscode/launch.json',
-            'lib/my-private-conga-contract.js',
-            'test/my-private-conga-contract.js',
+            'src/my-private-conga.ts',
+            'src/my-private-conga-contract.spec.ts',
+            'src/my-private-conga-contract.ts',
+            'src/index.ts',
             '.editorconfig',
-            '.eslintignore',
-            '.eslintrc.js',
             '.gitignore',
             '.npmignore',
-            'index.js',
             'package.json',
+            'tsconfig.json',
+            'tslint.json',
             'collections.json'
         ]);
     });
 
-    it('should generate a JavaScript project using options', async () => {
+    it('should generate a TypeScript project using options', async () => {
         await helpers.run(path.join(__dirname, '../../../generators/contract'))
             .inTmpDir((dir_) => {
                 dir = dir_;
             })
-            .withOptions({contractType: 'private',
-                language: 'javascript',
-                name: 'my-javascript-contract',
+            .withOptions({language: 'typescript',
+                contractType: 'private',
+                name: 'my-typescript-contract',
                 version: '0.0.1',
-                description: 'My JavaScript Contract',
+                description: 'My TypeScript Contract',
                 author: 'James Conga',
                 license: 'WTFPL',
                 asset: 'myPrivateConga',
                 mspId: 'Org1MSP'
             });
         assert.file([
-            'lib/my-private-conga-contract.js',
-            'test/my-private-conga-contract.js',
+            '.vscode/extensions.json',
+            '.vscode/launch.json',
+            'src/my-private-conga.ts',
+            'src/my-private-conga-contract.spec.ts',
+            'src/my-private-conga-contract.ts',
+            'src/index.ts',
             '.editorconfig',
-            '.eslintignore',
-            '.eslintrc.js',
             '.gitignore',
             '.npmignore',
-            'index.js',
             'package.json',
+            'tsconfig.json',
+            'tslint.json',
             'collections.json'
         ]);
     });
@@ -169,17 +189,17 @@ describe('Contract (JavaScript)', () => {
             .withPrompts({
                 subgenerator: 'contract',
                 contractType: 'private',
-                language: 'javascript',
-                name: 'my-javascript-contract',
+                language: 'typescript',
+                name: 'my-typescript-contract',
                 version: '0.0.1',
-                description: 'My JavaScript Contract',
+                description: 'My TypeScript Contract',
                 author: 'James Conga',
                 license: 'WTFPL',
-                asset: 'myPrivateConga',
+                asset: 'conga',
                 mspId: 'Org1MSP'
             });
         const pdcJSON = require(path.join(dir, 'collections.json'));
-        console.log("pdc variable" + pdcJSON)
+        console.log('pdc variable' + pdcJSON);
         pdcJSON.should.deep.equal(genericPDC);
     });
 
@@ -191,10 +211,10 @@ describe('Contract (JavaScript)', () => {
             .withPrompts({
                 subgenerator: 'contract',
                 contractType: 'private',
-                language: 'javascript',
-                name: 'my-javascript-contract',
+                language: 'typescript',
+                name: 'my-typescript-contract',
                 version: '0.0.1',
-                description: 'My JavaScript Contract',
+                description: 'My TypeScript Contract',
                 author: 'James Conga',
                 license: 'WTFPL',
                 asset: 'myPrivateConga',
@@ -212,23 +232,25 @@ describe('Contract (JavaScript)', () => {
             .withPrompts({
                 subgenerator: 'contract',
                 contractType: 'private',
-                language: 'javascript',
-                name: 'my-javascript-contract',
+                language: 'typescript',
+                name: 'my-typescript-contract',
                 version: '0.0.1',
-                description: 'My JavaScript Contract',
+                description: 'My TypeScript Contract',
                 author: 'James Conga',
                 license: 'WTFPL',
                 asset: 'myPrivateConga',
                 mspId: 'Org1MSP'
             });
-        assert.fileContent('lib/my-private-conga-contract.js', /SPDX-License-Identifier: WTFPL/);
-        assert.fileContent('lib/my-private-conga-contract.js', /class MyPrivateCongaContract extends Contract {/);
-        assert.fileContent('lib/my-private-conga-contract.js', /async myPrivateCongaExists\(ctx, myPrivateCongaId\) {/);
-        assert.fileContent('lib/my-private-conga-contract.js', /async createMyPrivateConga\(ctx, myPrivateCongaId\) {/);
-        assert.fileContent('lib/my-private-conga-contract.js', /async readMyPrivateConga\(ctx, myPrivateCongaId\) {/);
-        assert.fileContent('lib/my-private-conga-contract.js', /async updateMyPrivateConga\(ctx, myPrivateCongaId\) {/);
-        assert.fileContent('lib/my-private-conga-contract.js', /async deleteMyPrivateConga\(ctx, myPrivateCongaId\) {/);
-        assert.fileContent('lib/my-private-conga-contract.js', /async verifyMyPrivateConga\(ctx, myPrivateCongaId, objectToVerify\) {/);
+        assert.fileContent('src/my-private-conga.ts', /SPDX-License-Identifier: WTFPL/);
+        assert.fileContent('src/my-private-conga.ts', /export class MyPrivateConga {/);
+        assert.fileContent('src/my-private-conga-contract.ts', /SPDX-License-Identifier: WTFPL/);
+        assert.fileContent('src/my-private-conga-contract.ts', /export class MyPrivateCongaContract extends Contract {/);
+        assert.fileContent('src/my-private-conga-contract.ts', /public async myPrivateCongaExists\(ctx: Context, myPrivateCongaId: string\): Promise<boolean> {/);
+        assert.fileContent('src/my-private-conga-contract.ts', /public async createMyPrivateConga\(ctx: Context, myPrivateCongaId: string\): Promise<void> {/);
+        assert.fileContent('src/my-private-conga-contract.ts', /public async readMyPrivateConga\(ctx: Context, myPrivateCongaId: string\): Promise<string> {/);
+        assert.fileContent('src/my-private-conga-contract.ts', /public async updateMyPrivateConga\(ctx: Context, myPrivateCongaId: string\): Promise<void> {/);
+        assert.fileContent('src/my-private-conga-contract.ts', /public async deleteMyPrivateConga\(ctx: Context, myPrivateCongaId: string\): Promise<void> {/);
+        assert.fileContent('src/my-private-conga-contract.ts', /public async verifyMyPrivateConga\(ctx: Context, myPrivateCongaId: string, objectToVerify: MyPrivateConga\): Promise<boolean> {/);
     });
 
     it('should throw an error if an incorrect contract type is provided', async () => {
@@ -284,5 +306,5 @@ describe('Contract (JavaScript)', () => {
         const error = errorStub.args[0][0];
         error.message.should.match(/Sorry the language 'penguin' is not recognized/);
     });
-
+    
 });

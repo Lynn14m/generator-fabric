@@ -9,15 +9,27 @@ const helpers = require('yeoman-test');
 const path = require('path');
 const g2js = require('gradle-to-js/lib/parser');
 const fs = require('fs');
-
+const Mocha = require('mocha');
+const sinon = require('sinon');
 const chai = require('chai');
+
 chai.should();
 chai.use(require('chai-as-promised'));
 
 describe('Contract (Java)', () => {
-    it('should not create a rockstart project',async () => {
+    let dir;
 
-        await helpers.run(path.join(__dirname, '../../../generators/app'))
+    const sandbox = sinon.createSandbox();
+    afterEach(() => {
+        sandbox.restore();
+    });
+
+    it('should not create a rockstar project',async () => {
+        const errorStub = sandbox.stub(Mocha.Runner.prototype, 'uncaught');
+        const promise = new Promise((resolve) => {
+            errorStub.callsFake(resolve);
+        });
+        helpers.run(path.join(__dirname, '../../../generators/app'))
             .inTmpDir(() => {
             }).withPrompts({
                 subgenerator: 'contract',
@@ -30,12 +42,13 @@ describe('Contract (Java)', () => {
                 license: 'WTFPL',
                 asset: 'conga'
             }).then();
-
+        await promise;
+        errorStub.should.have.been.calledOnceWithExactly(sinon.match.instanceOf(Error));
+        const error = errorStub.args[0][0];
+        error.message.should.match(/Sorry the language 'rockstar' is not recognized/);
     });
     
     it('should generate a Java project using prompts (custom asset)', async () => {
-
-        let dir;
         await helpers.run(path.join(__dirname, '../../../generators/app'))
             .inTmpDir((dir_) => {
                 dir = dir_;
@@ -84,7 +97,6 @@ describe('Contract (Java)', () => {
     });
 
     it('should generate a Java project using prompts (default asset)', async () => {
-        let dir;
         await helpers.run(path.join(__dirname, '../../../generators/app'))
             .inTmpDir((dir_) => {
                 dir = dir_;
@@ -130,4 +142,30 @@ describe('Contract (Java)', () => {
         gradleBuildFile.version.should.equal('0.0.1');
     });
 
+    it('should throw an error if an incorrect contract type is provided', async () => {
+        const errorStub = sandbox.stub(Mocha.Runner.prototype, 'uncaught');
+        const promise = new Promise((resolve) => {
+            errorStub.callsFake(resolve);
+        });
+        helpers.run(path.join(__dirname, '../../../generators/app'))
+            .inTmpDir((dir_) => {
+                dir = dir_;
+            })
+            .withPrompts({
+                subgenerator: 'contract',
+                contractType: 'penguin',
+                language: 'typescript',
+                name: 'my-typescript-contract',
+                version: '0.0.1',
+                description: 'My Typescript Contract',
+                author: 'James Conga',
+                license: 'WTFPL',
+                asset: 'myPrivateConga',
+                mspId: 'Org1MSP'
+            });
+        await promise;
+        errorStub.should.have.been.calledOnceWithExactly(sinon.match.instanceOf(Error));
+        const error = errorStub.args[0][0];
+        error.message.should.match(/Sorry the contract type 'penguin' does not exist./);
+    });
 });

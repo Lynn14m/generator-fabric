@@ -94,7 +94,7 @@ module.exports = class extends Generator {
             questions[0].when = () => this.options.mspId;
             answers = await this.prompt(questions);
         } else {
-            throw new Error(`The contract type ${this.options.contractType} does not exist.`);
+            throw new Error(`Sorry the contract type '${this.options.contractType}' does not exist.`);
         }
 
         Object.assign(this.options, answers);
@@ -149,9 +149,9 @@ module.exports = class extends Generator {
                 this._rename(this.destinationPath(`${root}/MyContractTest.kt`), this.destinationPath(`${root}/${this.options.assetPascalCase}ContractTest.kt`));
             } else {
                 // language not understood
-                console.log(`Sorry ${this.options.language} is not recognized`);
+                throw new Error(`Sorry the language '${this.options.language}' is not recognized`);
             }
-        } else if (this.options.contractType === "private") {
+        } else {
             if (this.options.language.endsWith('script') ){
                 this.fs.copyTpl(this.templatePath(`private/${this.options.language}`), this._getDestination(), this.options, undefined, {globOptions : {dot : true}});
                 if (this.options.language === 'javascript') {
@@ -176,7 +176,7 @@ module.exports = class extends Generator {
                 this._rename(this.destinationPath(`${root}/MyContractTest.java`), this.destinationPath(`${root}/${this.options.assetPascalCase}ContractTest.java`));
             } else {
                 // language not understood
-                console.log(`Sorry ${this.options.language} is not recognized`);
+                throw new Error(`Sorry the language '${this.options.language}' is not recognized`);
             }
         }
 
