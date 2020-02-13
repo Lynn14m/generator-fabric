@@ -6,7 +6,8 @@
     "scripts": {
         "lint": "eslint .",
         "pretest": "npm run lint",
-        "test": "nyc mocha --recursive",
+        "test": "npm run nyc",
+        "nyc": "nyc mocha --recursive -t 10000",
         "prepublishOnly": "rimraf package-lock.json && npm prune --production && npm shrinkwrap"
     },
     "files": [
