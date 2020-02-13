@@ -77,7 +77,6 @@ describe('Contract (JavaScript)', () => {
             })
             .withPrompts({
                 subgenerator: 'contract',
-                contractType: 'default',
                 language: 'javascript',
                 name: 'my-javascript-contract',
                 version: '0.0.1',
@@ -116,8 +115,7 @@ describe('Contract (JavaScript)', () => {
             .inTmpDir((dir_) => {
                 dir = dir_;
             })
-            .withOptions({contractType: 'default',
-                language: 'javascript',
+            .withOptions({language: 'javascript',
                 name: 'my-javascript-contract',
                 version: '0.0.1',
                 description: 'My JavaScript Contract',
@@ -152,7 +150,6 @@ describe('Contract (JavaScript)', () => {
         let installStub = sinon.stub(generator.prototype,'installDependencies');
 
         let options = {
-            contractType: 'default',
             language: 'javascript',
             name: 'my-javascript-contract',
             version: '0.0.1',
@@ -200,7 +197,6 @@ describe('Contract (JavaScript)', () => {
 
         await helpers.run(path.join(__dirname, '../../../generators/contract'))
             .withOptions({
-                contractType: 'default',
                 language: 'javascript',
                 name: 'my-javascript-contract',
                 version: '0.0.1',
